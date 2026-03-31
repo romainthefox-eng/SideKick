@@ -243,6 +243,12 @@ export default function Integrations() {
         end_date: booking.endDate,
         monthly_price: null,
         status: 'active',
+        adults: 1,
+        children: 0,
+        source: booking.platform === 'Airbnb' ? 'airbnb' : booking.platform === 'Booking' ? 'booking' : 'direct',
+        booking_status: 'confirmed',
+        pets: false,
+        special_requests: '',
       });
 
       // Store platform source for Messagerie to read

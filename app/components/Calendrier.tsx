@@ -233,7 +233,7 @@ export default function Calendrier() {
     <div>
       <div className="header">
         <h1>Calendrier</h1>
-        <p>Gérer les dates de location et les événements</p>
+        <p>Gérer les dates de location et les réservations</p>
       </div>
 
       <div className="content-card calendar-container">
@@ -288,7 +288,7 @@ export default function Calendrier() {
         </div>
 
         <div className="events-sidebar">
-          <h3>Événements à venir</h3>
+        <h3>Réservations à venir</h3>
           <button 
             className="btn btn-primary"
             onClick={() => {
@@ -296,12 +296,12 @@ export default function Calendrier() {
               setShowAddEvent(true);
             }}
           >
-            <i className="fas fa-plus"></i> Ajouter un événement
+            <i className="fas fa-plus"></i> Ajouter une réservation
           </button>
 
           <div className="events-list">
             {sortedEvents.length === 0 ? (
-              <p className="no-events">Aucun événement programmé</p>
+              <p className="no-events">Aucune réservation programmée</p>
             ) : (
               sortedEvents.map(event => (
                 <div key={`${event.id}-${event.date}`} className="event-card">
@@ -359,7 +359,7 @@ export default function Calendrier() {
       {showAddEvent && (
         <div className="modal-overlay" onClick={() => setShowAddEvent(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Ajouter un événement</h3>
+            <h3>Ajouter une réservation</h3>
             <div className="form-group">
               <label>Date</label>
               <input 
@@ -374,7 +374,7 @@ export default function Calendrier() {
                 type="text"
                 value={newEvent.title}
                 onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-                placeholder="Titre de l'événement"
+                placeholder="Titre de la réservation"
               />
             </div>
             <div className="form-group">

@@ -262,7 +262,13 @@ export default function Demandes() {
       start_date: startDate,
       end_date: endDate,
       monthly_price: entities.price || 0,
-      status: 'active'
+      status: 'active',
+      adults: 1,
+      children: 0,
+      source: 'direct',
+      booking_status: 'confirmed',
+      pets: false,
+      special_requests: ''
     });
 
     const duration = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));
@@ -725,7 +731,13 @@ export default function Demandes() {
             start_date: startDate,
             end_date: endDate,
             monthly_price: price,
-            status: 'active'
+            status: 'active',
+            adults: 1,
+            children: 0,
+            source: 'direct',
+            booking_status: 'confirmed',
+            pets: false,
+            special_requests: ''
           });
 
           const duration = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24));

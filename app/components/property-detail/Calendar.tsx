@@ -137,12 +137,12 @@ export default function Calendar({ logementId, events, onAddEvent }: CalendarPro
       </div>
 
       <button onClick={() => setShowForm(!showForm)} className="add-event-btn">
-        <i className="fas fa-plus"></i> Ajouter un événement
+        <i className="fas fa-plus"></i> Ajouter une réservation
       </button>
 
       {showForm && (
         <div className="event-form">
-          <h3>Nouvel événement</h3>
+          <h3>Nouvelle réservation</h3>
           <form onSubmit={handleSubmitEvent}>
             <div className="form-group">
               <label>Titre *</label>

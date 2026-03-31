@@ -56,6 +56,13 @@ export interface Rental {
   end_date: string;
   monthly_price: number | null;
   status: 'active' | 'ended' | 'pending';
+  // Reservation-specific fields (added via migration_reservation_fields.sql)
+  adults: number | null;
+  children: number | null;
+  source: 'airbnb' | 'booking' | 'direct' | 'autre' | null;
+  booking_status: 'confirmed' | 'pending' | 'paid' | null;
+  pets: boolean | null;
+  special_requests: string | null;
   created_at: string;
   updated_at: string;
 }

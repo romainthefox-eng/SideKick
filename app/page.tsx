@@ -5,6 +5,7 @@ import './page.css';
 import Logement from './components/Logement';
 import Messagerie from './components/Messagerie';
 import Calendrier from './components/Calendrier';
+import Reservations from './components/Reservations';
 import Demandes from './components/Demandes';
 import Analyses from './components/Analyses';
 import Integrations from './components/Integrations';
@@ -33,11 +34,12 @@ export default function Home() {
   }, []);
 
   const sections = [
-    { id: 'accueil',       label: 'Accueil',         icon: 'fas fa-home' },
-    { id: 'logement',      label: 'Logement',         icon: 'fas fa-building' },
-    { id: 'messagerie',    label: 'Messagerie',        icon: 'fas fa-comments' },
-    { id: 'calendrier',    label: 'Calendrier',        icon: 'fas fa-calendar' },
-    { id: 'demande',       label: 'Demande',           icon: 'fas fa-question-circle' },
+    { id: 'accueil',        label: 'Accueil',          icon: 'fas fa-home' },
+    { id: 'logement',       label: 'Logement',          icon: 'fas fa-building' },
+    { id: 'messagerie',     label: 'Messagerie',         icon: 'fas fa-comments' },
+    { id: 'reservations',   label: 'Réservations',       icon: 'fas fa-calendar-check' },
+    { id: 'calendrier',     label: 'Calendrier',         icon: 'fas fa-calendar' },
+    { id: 'demande',        label: 'Demande',            icon: 'fas fa-question-circle' },
     { id: 'analyse',       label: 'Analyse',           icon: 'fas fa-chart-bar' },
     { id: 'integrations',  label: 'Intégrations',      icon: 'fas fa-plug' },
     { id: 'avis',          label: 'Avis',              icon: 'fas fa-star' },
@@ -46,7 +48,8 @@ export default function Home() {
   const cards = [
     { section: 'logement',     title: 'Logement',           description: 'Gérez vos biens et locations',                     icon: 'fas fa-building' },
     { section: 'messagerie',   title: 'Messagerie',          description: 'Communiquez avec vos locataires via l\'IA',         icon: 'fas fa-comments' },
-    { section: 'calendrier',   title: 'Calendrier',          description: 'Visualisez toutes vos réservations',                icon: 'fas fa-calendar' },
+    { section: 'reservations',  title: 'Réservations',         description: 'Calendrier des séjours par logement',               icon: 'fas fa-calendar-check' },
+    { section: 'calendrier',   title: 'Calendrier',          description: 'Visualisez événements, tâches et incidents',         icon: 'fas fa-calendar' },
     { section: 'demande',      title: 'Discussions',          description: 'Posez vos questions et importez des documents',    icon: 'fas fa-comments' },
     { section: 'analyse',      title: 'Analyse',             description: 'Revenus, RevPAR, alertes intelligentes',           icon: 'fas fa-chart-bar' },
     { section: 'integrations', title: 'Intégrations',        description: 'Sync Airbnb, Booking.com et automatisation IA',    icon: 'fas fa-plug' },
@@ -166,6 +169,13 @@ export default function Home() {
         {activeSection === 'messagerie' && (
           <section className="section">
             <Messagerie />
+          </section>
+        )}
+
+        {/* Réservations Section */}
+        {activeSection === 'reservations' && (
+          <section className="section">
+            <Reservations />
           </section>
         )}
 
