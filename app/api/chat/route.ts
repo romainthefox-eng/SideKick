@@ -70,12 +70,12 @@ interface DataContext {
 
 export async function POST(req: Request) {
   try {
-    const { userMessage, dataContext } = await req.json();
+    const { messages, dataContext } = await req.json();
 
     // Verify Groq API key
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      console.error('❌ GROQ_API_KEY not found');
+      console.error('GROQ_API_KEY not found');
       return NextResponse.json(
         { error: 'Groq API key not configured' },
         { status: 500 }
@@ -85,6 +85,42 @@ export async function POST(req: Request) {
     // Build context
     const contextStr = buildContextString(dataContext);
 
+    const systemPrompt = `Tu es SideKick, un assistant de gestion locative. Tu as accès à toutes les données réelles de l'utilisateur.
+
+DONNÉES EN TEMPS RÉEL:
+${contextStr}
+
+RÈGLES DE COMPORTEMENT:
+- Réponds uniquement en français
+- Pas d'emojis, jamais
+- Réponses courtes et directes
+- Pas de formules d'intro ("Bien sûr !", "Absolument !") — commence directement par la réponse
+- Utilise les données fournies pour répondre avec précision (noms réels, montants réels, dates réelles)
+
+CRÉATION DE RÉSERVATION — INSTRUCTIONS CRITIQUES:
+Quand l'utilisateur veut ajouter une réservation, collecte les infos manquantes UNE PAR UNE dans cet ordre:
+1. Logement (si plusieurs logements existent et qu'il n'est pas précisé)
+2. Dates d'arrivée et départ (en nuitées)
+3. Nom du voyageur
+4. Prix total (optionnel — demande si pas mentionné)
+
+Dès que tu as logement + dates + nom, génère EXACTEMENT à la fin de ta réponse la balise JSON suivante (sans espace, sur une seule ligne):
+[RESERVATION:{"logement_id":ID,"tenant_name":"NOM","start_date":"YYYY-MM-DD","end_date":"YYYY-MM-DD","monthly_price":PRIX,"adults":1,"children":0,"source":"direct","booking_status":"confirmed","pets":false,"special_requests":""}]
+
+Remplace ID par le vrai id numérique du logement depuis les données. Si le prix est inconnu, mets 0.
+IMPORTANT: Ne crée jamais de réservation sans confirmation explicite de l'utilisateur. Confirme les détails avant d'émettre [RESERVATION:...].
+
+Si l'utilisateur demande d'enregistrer une réservation incomplète (infos manquantes), émets:
+[DRAFT_RESERVATION:{"logement_id":ID,"tenant_name":"NOM ou null","start_date":"YYYY-MM-DD ou null","end_date":"YYYY-MM-DD ou null","monthly_price":0,"note":"INFO MANQUANTE"}]`;
+
+    const groqMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages.map((m: { role: string; content: string }) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    ];
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -93,29 +129,8 @@ export async function POST(req: Request) {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [
-          {
-            role: 'system',
-            content: `Tu es SideKick, un assistant de gestion locative. Tu as accès à toutes les données réelles de l'utilisateur.
-
-DONNÉES EN TEMPS RÉEL:
-${contextStr}
-
-RÈGLES STRICTES:
-- Réponds uniquement en français
-- Pas d'emojis, jamais
-- Réponses courtes et directes — maximum 5 phrases sauf si une analyse détaillée est explicitement demandée
-- Utilise les données fournies pour répondre avec précision (noms, montants, dates réels)
-- Si une information manque dans les données, dis-le clairement
-- Pas de formules d'intro du type "Bien sûr !", "Absolument !", "Avec plaisir !"
-- Commence directement par la réponse`
-          },
-          {
-            role: 'user',
-            content: userMessage
-          }
-        ],
-        temperature: 0.4,
+        messages: groqMessages,
+        temperature: 0.35,
         max_tokens: 1024
       })
     });
@@ -128,10 +143,11 @@ RÈGLES STRICTES:
 
     const data = await response.json();
     const aiResponse = data.choices?.[0]?.message?.content || 'Pas de réponse';
+    const lastMessage = messages[messages.length - 1]?.content ?? '';
 
     return NextResponse.json({
       response: aiResponse,
-      category: determinCategory(userMessage)
+      category: determinCategory(lastMessage)
     });
 
   } catch (error) {

@@ -3,13 +3,6 @@
 import { useState } from 'react';
 import { useProperty, type Logement } from '../context/PropertyContext';
 
-interface Message {
-  id: number;
-  question: string;
-  response: string;
-  timestamp: string;
-  category: string;
-}
 
 const FIELD_LABELS: Record<string, string> = {
   name: 'Nom du logement',
@@ -30,10 +23,7 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 export default function Demandes() {
-  const { logements, rentals, tasks, incidents, addRental, addLogement, updateLogement } = useProperty();
-  
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+  const { logements, rentals, tasks, incidents, addRental, addLogement, updateLogement, chatMessages: messages, setChatMessages: setMessages, chatInput: input, setChatInput: setInput, addPendingDraft } = useProperty();
   const [isLoading, setIsLoading] = useState(false);
 
   // ─── Document import states ───────────────────────────────────────
@@ -57,7 +47,7 @@ export default function Demandes() {
     return true;
   };
 
-  // Call OpenAI API
+  // Call OpenAI API — sends full conversation history
   const callOpenAI = async (userMessage: string): Promise<{ response: string; category: string }> => {
     try {
       // Load reviews from localStorage
@@ -127,13 +117,20 @@ export default function Demandes() {
         reviews,
       };
 
+      // Build full conversation history: oldest first, each entry → user + assistant pair
+      const historyMessages = [...messages].reverse().flatMap(m => [
+        { role: 'user' as const, content: m.question },
+        { role: 'assistant' as const, content: m.response },
+      ]);
+      const apiMessages = [...historyMessages, { role: 'user' as const, content: userMessage }];
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userMessage,
+          messages: apiMessages,
           dataContext
         })
       });
@@ -1111,31 +1108,74 @@ export default function Demandes() {
     if (!input.trim()) return;
 
     setIsLoading(true);
+    const userText = input;
+    setInput('');
     try {
-      // Use DeepSeek AI via API
-      const result = await callOpenAI(input);
-      
-      const newMessage: Message = {
+      const result = await callOpenAI(userText);
+      let displayResponse = result.response;
+
+      // --- Parse [RESERVATION:{...}] action ---
+      const reservationMatch = result.response.match(/\[RESERVATION:(\{[\s\S]*?\})\]/);
+      if (reservationMatch) {
+        displayResponse = result.response.replace(/\[RESERVATION:[\s\S]*?\]/, '').trim();
+        try {
+          const data = JSON.parse(reservationMatch[1]);
+          if (data.logement_id && data.tenant_name && data.start_date && data.end_date) {
+            await addRental({
+              logement_id: Number(data.logement_id),
+              tenant_name: data.tenant_name,
+              email: data.email ?? '',
+              phone: data.phone ?? '',
+              start_date: data.start_date,
+              end_date: data.end_date,
+              monthly_price: data.monthly_price ?? 0,
+              status: 'active',
+              adults: data.adults ?? 1,
+              children: data.children ?? 0,
+              source: data.source ?? 'direct',
+              booking_status: data.booking_status ?? 'confirmed',
+              pets: data.pets ?? false,
+              special_requests: data.special_requests ?? '',
+            });
+            displayResponse = (displayResponse ? displayResponse + '\n\n' : '') + 'Réservation enregistrée.';
+          }
+        } catch (e) {
+          console.error('Failed to parse/create reservation action:', e);
+        }
+      }
+
+      // --- Parse [DRAFT_RESERVATION:{...}] action → pending notification ---
+      const draftMatch = result.response.match(/\[DRAFT_RESERVATION:(\{[\s\S]*?\})\]/);
+      if (draftMatch) {
+        displayResponse = result.response.replace(/\[DRAFT_RESERVATION:[\s\S]*?\]/, '').trim();
+        try {
+          const data = JSON.parse(draftMatch[1]);
+          addPendingDraft(data);
+          displayResponse = (displayResponse ? displayResponse + '\n\n' : '') + 'Brouillon enregistré — retrouvez-le dans le centre de notifications.';
+        } catch (e) {
+          console.error('Failed to parse draft action:', e);
+        }
+      }
+
+      const newMessage: ChatMessage = {
         id: Date.now(),
-        question: input,
-        response: result.response,
+        question: userText,
+        response: displayResponse,
         timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
         category: result.category
       };
 
       setMessages([newMessage, ...messages]);
-      setInput('');
     } catch (error) {
       console.error('Error:', error);
-      const newMessage: Message = {
+      const newMessage: ChatMessage = {
         id: Date.now(),
-        question: input,
-        response: '❌ Erreur de communication. Réessayez!',
+        question: userText,
+        response: 'Erreur de communication. Réessayez.',
         timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
         category: 'Erreur'
       };
       setMessages([newMessage, ...messages]);
-      setInput('');
     } finally {
       setIsLoading(false);
     }

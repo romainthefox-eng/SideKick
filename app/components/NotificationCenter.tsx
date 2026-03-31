@@ -4,13 +4,14 @@ import { useProperty, Task, Incident } from '../context/PropertyContext';
 import Link from 'next/link';
 
 export default function NotificationCenter() {
-  const { getNotifications } = useProperty();
+  const { getNotifications, pendingDrafts, dismissPendingDraft, logements } = useProperty();
   
   const notifications = getNotifications();
   const taskNotifications = notifications.filter(n => n.type === 'task');
   const incidentNotifications = notifications.filter(n => n.type === 'incident');
+  const totalBadge = notifications.length + pendingDrafts.length;
 
-  if (notifications.length === 0) {
+  if (totalBadge === 0) {
     return (
       <div className="notification-center">
         <div className="notification-header">
@@ -79,7 +80,7 @@ export default function NotificationCenter() {
         <h2>
           <i className="fas fa-bell"></i> Centre de Notifications
         </h2>
-        <span className="notification-badge">{notifications.length}</span>
+        <span className="notification-badge">{totalBadge}</span>
       </div>
 
       <div className="notifications-grid">
@@ -169,6 +170,55 @@ export default function NotificationCenter() {
                     <Link href={`/properties/${notif.logement.id}`}>
                       <button className="btn-view">Voir</button>
                     </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {pendingDrafts.length > 0 && (
+          <div className="notification-section drafts-section">
+            <h3>
+              <i className="fas fa-clock"></i> Réservations en attente ({pendingDrafts.length})
+            </h3>
+            <div className="notifications-list">
+              {pendingDrafts.map(draft => {
+                const logement = logements.find(l => l.id === draft.logement_id);
+                return (
+                  <div key={draft.id} className="notification-item draft-item">
+                    <div className="notification-icon">
+                      <i className="fas fa-calendar-plus"></i>
+                    </div>
+                    <div className="notification-content">
+                      <p className="notification-title">
+                        {draft.tenant_name ?? 'Voyageur non renseigné'}
+                        {logement ? ` — ${logement.name}` : ''}
+                      </p>
+                      {(draft.start_date || draft.end_date) && (
+                        <p className="notification-property">
+                          <i className="fas fa-calendar"></i>{' '}
+                          {draft.start_date ? new Date(draft.start_date).toLocaleDateString('fr-FR') : '?'}
+                          {' → '}
+                          {draft.end_date ? new Date(draft.end_date).toLocaleDateString('fr-FR') : '?'}
+                        </p>
+                      )}
+                      {draft.note && (
+                        <p className="notification-description">Infos manquantes : {draft.note}</p>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <Link href="/?tab=reservations">
+                        <button className="btn-view">Compléter</button>
+                      </Link>
+                      <button
+                        className="btn-view"
+                        style={{ background: '#f3f4f6', color: '#6b7280', border: '1px solid #e5e7eb' }}
+                        onClick={() => dismissPendingDraft(draft.id)}
+                      >
+                        Ignorer
+                      </button>
+                    </div>
                   </div>
                 );
               })}
@@ -272,6 +322,16 @@ export default function NotificationCenter() {
         .incident-item.priority-high {
           border-left-color: #dc2626;
           background: #fef2f2;
+        }
+
+        .draft-item {
+          border-left-color: #f59e0b;
+          background: #fffbeb;
+        }
+
+        .draft-item .notification-icon {
+          background: #fef3c7;
+          color: #d97706;
         }
 
         .notification-item:hover {

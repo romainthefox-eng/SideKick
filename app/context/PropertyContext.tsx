@@ -17,12 +17,38 @@ import * as supabaseLib from '../../lib/supabase';
 // Export types for use in components
 export type { Logement, Rental, AccessInstruction, Task, Incident, DailyEvent };
 
+interface ChatMessage {
+  id: number;
+  question: string;
+  response: string;
+  timestamp: string;
+  category: string;
+}
+
+export interface PendingDraft {
+  id: number;
+  logement_id?: number | null;
+  tenant_name?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  monthly_price?: number | null;
+  note?: string | null;
+  created_at: string;
+}
+
 interface PropertyContextType {
   logements: Logement[];
   rentals: Rental[];
   tasks: Task[];
   incidents: Incident[];
   loading: boolean;
+  chatMessages: ChatMessage[];
+  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+  chatInput: string;
+  setChatInput: React.Dispatch<React.SetStateAction<string>>;
+  pendingDrafts: PendingDraft[];
+  addPendingDraft: (draft: Omit<PendingDraft, 'id' | 'created_at'>) => void;
+  dismissPendingDraft: (id: number) => void;
   
   // Logement operations
   addLogement: (logement: Omit<Logement, 'id' | 'created_at' | 'updated_at'>) => Promise<Logement>;
@@ -72,6 +98,20 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [pendingDrafts, setPendingDrafts] = useState<PendingDraft[]>([]);
+
+  const addPendingDraft = (draft: Omit<PendingDraft, 'id' | 'created_at'>) => {
+    setPendingDrafts(prev => [
+      { ...draft, id: Date.now(), created_at: new Date().toISOString() },
+      ...prev,
+    ]);
+  };
+
+  const dismissPendingDraft = (id: number) => {
+    setPendingDrafts(prev => prev.filter(d => d.id !== id));
+  };
 
   // Load data on mount
   useEffect(() => {
@@ -376,6 +416,13 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
     tasks,
     incidents,
     loading,
+    chatMessages,
+    setChatMessages,
+    chatInput,
+    setChatInput,
+    pendingDrafts,
+    addPendingDraft,
+    dismissPendingDraft,
     addLogement,
     updateLogement,
     deleteLogement,
