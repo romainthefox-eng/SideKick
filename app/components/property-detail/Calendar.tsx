@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { DailyEvent } from '@/app/context/PropertyContext';
+import ReservationModal from '@/app/components/ReservationModal';
 
 interface CalendarProps {
   logementId: number;
@@ -11,7 +12,9 @@ interface CalendarProps {
 
 export default function Calendar({ logementId, events, onAddEvent }: CalendarProps) {
   const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
-  const [showForm, setShowForm] = useState(false);
+  const [showReservationModal, setShowReservationModal] = useState(false);
+  const [modalStartDate, setModalStartDate] = useState<string | undefined>();
+  const [showEventForm, setShowEventForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     type: 'autre' as 'visite' | 'entretien' | 'autre',
@@ -65,7 +68,7 @@ export default function Calendar({ logementId, events, onAddEvent }: CalendarPro
       date: new Date().toISOString().split('T')[0],
       time: '10:00'
     });
-    setShowForm(false);
+    setShowEventForm(false);
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
@@ -136,13 +139,24 @@ export default function Calendar({ logementId, events, onAddEvent }: CalendarPro
         })}
       </div>
 
-      <button onClick={() => setShowForm(!showForm)} className="add-event-btn">
-        <i className="fas fa-plus"></i> Ajouter une réservation
-      </button>
+      {/* ── Action buttons ────────────────────────────────────────────────── */}
+      <div style={{ display: 'flex', gap: '10px', marginTop: '12px', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => { setModalStartDate(undefined); setShowReservationModal(true); }}
+          className="add-event-btn"
+          style={{ background: '#2c5aa0', color: 'white', borderColor: '#2c5aa0' }}
+        >
+          <i className="fas fa-calendar-plus"></i> Nouvelle réservation
+        </button>
+        <button onClick={() => setShowEventForm(!showEventForm)} className="add-event-btn">
+          <i className="fas fa-plus"></i> Ajouter un rappel
+        </button>
+      </div>
 
-      {showForm && (
+      {/* ── Reminder form (unchanged) ──────────────────────────────────────── */}
+      {showEventForm && (
         <div className="event-form">
-          <h3>Nouvelle réservation</h3>
+          <h3>Nouveau rappel</h3>
           <form onSubmit={handleSubmitEvent}>
             <div className="form-group">
               <label>Titre *</label>
@@ -150,7 +164,7 @@ export default function Calendar({ logementId, events, onAddEvent }: CalendarPro
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Titre de l'événement"
+                placeholder="Titre du rappel"
                 required
               />
             </div>
@@ -190,10 +204,19 @@ export default function Calendar({ logementId, events, onAddEvent }: CalendarPro
 
             <div className="form-actions">
               <button type="submit" className="btn-primary">Ajouter</button>
-              <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">Annuler</button>
+              <button type="button" onClick={() => setShowEventForm(false)} className="btn-secondary">Annuler</button>
             </div>
           </form>
         </div>
+      )}
+
+      {/* ── Reservation modal (shared with Reservations tab) ──────────────── */}
+      {showReservationModal && (
+        <ReservationModal
+          defaultLogementId={logementId}
+          defaultStartDate={modalStartDate}
+          onClose={() => setShowReservationModal(false)}
+        />
       )}
 
     </div>
