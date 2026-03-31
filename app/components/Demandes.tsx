@@ -73,6 +73,14 @@ export default function Demandes() {
           concierge_commission: l.concierge_commission,
           wifi_code: l.wifi_code,
           check_in_type: l.check_in_type,
+          key_location: l.key_location,
+          building_code: l.building_code,
+          water_meter_location: l.water_meter_location,
+          electricity_meter_location: l.electricity_meter_location,
+          garbage_info: l.garbage_info,
+          specific_equipment: l.specific_equipment,
+          cleaning_checklist: l.cleaning_checklist,
+          linage_storage: l.linage_storage,
           notes: l.notes,
           furnished: l.furnished,
           parking: l.parking,
@@ -1244,6 +1252,32 @@ export default function Demandes() {
 
           {/* INPUT */}
           <div className="chat-input-section">
+            {/* Quick action buttons */}
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              {[
+                { label: 'Répondre à un voyageur', prompt: 'Un voyageur me demande : "' },
+                { label: 'Optimiser mes prix', prompt: 'Analyse mon calendrier et suggère des ajustements de prix pour les prochaines semaines.' },
+                { label: 'Planning ménage & tâches', prompt: 'Analyse mon calendrier de réservations et dis-moi ce qu\'il faut préparer : ménages à planifier, trous à combler, maintenances urgentes.' },
+                { label: 'Analyser mes avis', prompt: 'Analyse tous mes avis voyageurs et donne-moi un rapport synthétique : points forts, points faibles, 3 actions prioritaires.' },
+              ].map(({ label, prompt }) => (
+                <button
+                  key={label}
+                  onClick={() => setInput(prompt)}
+                  style={{
+                    padding: '5px 12px',
+                    fontSize: '12px',
+                    background: '#f0f4ff',
+                    border: '1px solid #c7d2fe',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    color: '#3730a3',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
             <div className="input-wrapper">
               <textarea 
                 value={input}
