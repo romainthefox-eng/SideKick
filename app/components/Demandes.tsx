@@ -30,7 +30,7 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 export default function Demandes() {
-  const { logements, rentals, addRental, addLogement, updateLogement } = useProperty();
+  const { logements, rentals, tasks, incidents, addRental, addLogement, updateLogement } = useProperty();
   
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -72,18 +72,57 @@ export default function Demandes() {
           id: l.id,
           name: l.name,
           address: l.address,
-          price: l.price,
+          postal_code: l.postal_code,
           type: l.type,
-          rooms: l.rooms
+          rooms: l.rooms,
+          price: l.price,
+          price_per_night: l.price_per_night,
+          surface: l.surface,
+          location_type: l.location_type,
+          cleaning_fees: l.cleaning_fees,
+          concierge_commission: l.concierge_commission,
+          wifi_code: l.wifi_code,
+          check_in_type: l.check_in_type,
+          notes: l.notes,
+          furnished: l.furnished,
+          parking: l.parking,
+          internet: l.internet,
         })),
         rentals: rentals.map(r => ({
           id: r.id,
           logement_id: r.logement_id,
           tenant_name: r.tenant_name,
+          email: r.email,
+          phone: r.phone,
           monthly_price: r.monthly_price,
           start_date: r.start_date,
           end_date: r.end_date,
-          status: r.status
+          status: r.status,
+          adults: r.adults,
+          children: r.children,
+          source: r.source,
+          booking_status: r.booking_status,
+          pets: r.pets,
+          special_requests: r.special_requests,
+        })),
+        tasks: tasks.map(t => ({
+          id: t.id,
+          logement_id: t.logement_id,
+          title: t.title,
+          category: t.category,
+          due_date: t.due_date,
+          completed: t.completed,
+          priority: t.priority,
+          assigned_to: t.assigned_to,
+        })),
+        incidents: incidents.map(i => ({
+          id: i.id,
+          logement_id: i.logement_id,
+          title: i.title,
+          date: i.date,
+          resolved: i.resolved,
+          priority: i.priority,
+          category: i.category,
         })),
         reviews,
       };
@@ -123,9 +162,9 @@ export default function Demandes() {
       };
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      console.error('❌ erreur complète:', errorMsg);
+      console.error('callOpenAI error:', errorMsg);
       return {
-        response: `❌ **Erreur**: ${errorMsg}\n\n💡 **Solution**: Vérifiez que:\n1. Votre clé API OpenAI est correcte\n2. Vous avez du crédit OpenAI\n3. Vous utilisez un modèle disponible\n\n**Mode local activé**. Essayez: "Combien de locations?"`,
+        response: `Erreur: ${errorMsg}`,
         category: 'Autres'
       };
     }

@@ -111,13 +111,19 @@ export default function ReservationModal({
   };
 
   const [form, setForm]       = useState<FormData>(buildForm);
-  const [saving, setSaving]   = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [saving, setSaving]       = useState(false);
+  const [deleting, setDeleting]   = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const nights = nightsBetween(form.start_date, form.end_date);
 
   const handleSave = async () => {
-    if (!form.tenant_name.trim() || !form.start_date || !form.end_date || !form.logement_id || nights <= 0) return;
+    setSaveError(null);
+    if (!form.logement_id)          { setSaveError('Veuillez sélectionner un logement.'); return; }
+    if (!form.tenant_name.trim())   { setSaveError('Le nom du voyageur est obligatoire.'); return; }
+    if (!form.start_date)           { setSaveError('Veuillez saisir une date d\'arrivée.'); return; }
+    if (!form.end_date)             { setSaveError('Veuillez saisir une date de départ.'); return; }
+    if (nights <= 0)                { setSaveError('La date de départ doit être après la date d\'arrivée.'); return; }
     setSaving(true);
     try {
       const payload = {
@@ -143,8 +149,17 @@ export default function ReservationModal({
       }
       onDone?.();
       onClose();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erreur sauvegarde réservation:', err);
+      const msg = err instanceof Error ? err.message
+        : typeof err === 'object' && err !== null && 'message' in err ? String((err as {message: unknown}).message)
+        : 'Erreur inconnue';
+      // Detect missing column → migration not applied
+      if (msg.includes('column') || msg.includes('does not exist') || msg.includes('42703')) {
+        setSaveError('La migration SQL n\'a pas encore été appliquée dans Supabase. Exécute le fichier database/migration_reservation_fields.sql dans l\'éditeur SQL de Supabase.');
+      } else {
+        setSaveError(`Erreur : ${msg}`);
+      }
     } finally {
       setSaving(false);
     }
@@ -153,12 +168,15 @@ export default function ReservationModal({
   const handleDelete = async () => {
     if (!editing || !confirm('Supprimer cette réservation ?')) return;
     setDeleting(true);
+    setSaveError(null);
     try {
       await deleteRental(editing.id);
       onDone?.();
       onClose();
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Erreur suppression:', err);
+      const msg = err instanceof Error ? err.message : 'Erreur inconnue';
+      setSaveError(`Erreur suppression : ${msg}`);
     } finally {
       setDeleting(false);
     }
@@ -374,6 +392,18 @@ export default function ReservationModal({
           />
         </div>
 
+        {/* Error banner */}
+        {saveError && (
+          <div style={{
+            background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px',
+            padding: '10px 14px', marginBottom: '16px', color: '#b91c1c',
+            fontSize: '13px', lineHeight: '1.5',
+          }}>
+            <i className="fas fa-exclamation-circle" style={{ marginRight: '6px' }} />
+            {saveError}
+          </div>
+        )}
+
         {/* Actions */}
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'space-between', alignItems: 'center' }}>
           {editing && (
@@ -398,14 +428,7 @@ export default function ReservationModal({
             <button
               className="btn btn-primary"
               onClick={handleSave}
-              disabled={
-                saving ||
-                !form.tenant_name.trim() ||
-                !form.start_date ||
-                !form.end_date ||
-                !form.logement_id ||
-                nights <= 0
-              }
+              disabled={saving}
             >
               {saving
                 ? <><i className="fas fa-spinner fa-spin" /> Enregistrement…</>
