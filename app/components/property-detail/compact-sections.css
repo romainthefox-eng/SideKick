@@ -1,0 +1,199 @@
+/* ===== COMPACT SECTIONS STYLING ===== */
+/* Applied to DailyAgenda, CleaningAndTasks, MaintenanceIncidents, AccessInstructions */
+
+/* Base section container */
+.daily-agenda,
+.cleaning-tasks,
+.maintenance-incidents,
+.access-instructions {
+  background: white;
+  border-radius: 8px;
+  padding: 0.8rem 0.6rem;
+  border: 1px solid #ddd;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #eee;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.section-header i {
+  color: #2c5aa0;
+  font-size: 0.85rem;
+}
+
+/* Empty states */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 0.6rem;
+  color: #999;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 1.8rem;
+  margin-bottom: 0.4rem;
+  opacity: 0.4;
+  color: #ccc;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+/* List containers */
+.events-list,
+.tasks-list,
+.incidents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Task and event items */
+.task-item,
+.event-item,
+.incident-card {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.4rem 0.5rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border-left: 3px solid #2c5aa0;
+  transition: all 0.2s;
+  font-size: 0.8rem;
+}
+
+.task-item:hover,
+.event-item:hover,
+.incident-card:hover {
+  background: #f3f3f3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Text styles */
+.task-title,
+.event-title,
+.incident-title {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.task-description,
+.event-description,
+.incident-description {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Meta information */
+.task-meta,
+.event-meta,
+.incident-footer {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 0.2rem;
+}
+
+/* Category and status badges */
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #eee;
+}
+
+.category-header h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.count-badge,
+.event-count,
+.progress,
+.priority-badge,
+.status-badge {
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: #f0f8ff;
+  color: #2c5aa0;
+}
+
+/* Buttons in compact sections */
+.btn-resolve,
+.btn-reopen,
+.btn-delete-task,
+.btn-delete-incident {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  color: #666;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.btn-resolve:hover,
+.btn-reopen:hover {
+  background: #2c5aa0;
+  color: white;
+  border-color: #2c5aa0;
+}
+
+.btn-delete-task:hover,
+.btn-delete-incident:hover {
+  background: #c62828;
+  color: white;
+  border-color: #c62828;
+}
+
+/* Priority colors */
+.priority-low {
+  border-left-color: #2e7d32;
+}
+
+.priority-medium {
+  border-left-color: #d89a3f;
+}
+
+.priority-high {
+  border-left-color: #c62828;
+}

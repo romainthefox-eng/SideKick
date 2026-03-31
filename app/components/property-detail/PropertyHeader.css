@@ -1,0 +1,228 @@
+.ph-header {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ph-header-top {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.ph-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.ph-header-top h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #1f2937;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.ph-location-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ph-location-badge.ph-longterm {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.ph-location-badge.ph-shortterm {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ph-address {
+  margin: 0;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.ph-address i {
+  color: #9ca3af;
+}
+
+.ph-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .ph-stats { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .ph-stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .ph-stats { grid-template-columns: 1fr; }
+}
+
+.ph-stat-item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ph-stat-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.ph-stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.3px;
+}
+
+.ph-status-occupied {
+  color: #16a34a;
+}
+
+.ph-status-available {
+  color: #ea580c;
+}
+
+.ph-info-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .ph-info-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .ph-info-cards { grid-template-columns: 1fr; }
+}
+
+.ph-info-card {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ph-info-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.ph-info-value {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.ph-rental-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.ph-rental-section h3 {
+  margin: 0 0 0.8rem 0;
+  font-size: 0.8rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.ph-tenant-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.ph-tenant-email {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ph-rental-divider {
+  width: 1px;
+  background: #e5e7eb;
+  height: 60px;
+}
+
+.ph-rental-date {
+  margin: 0 0 0.4rem 0;
+  color: #1f2937;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ph-rental-date:last-child { margin-bottom: 0; }
+
+.ph-tenant-email i,
+.ph-rental-date i {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .ph-header { padding: 1.5rem; }
+  .ph-header-top h1 { font-size: 1.4rem; }
+  .ph-stats { grid-template-columns: 1fr; gap: 1rem; }
+  .ph-info-cards { grid-template-columns: 1fr; }
+  .ph-rental-card { grid-template-columns: 1fr; gap: 1rem; }
+  .ph-rental-divider { display: none; }
+}
